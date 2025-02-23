@@ -1,0 +1,46 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket.IO Two-Person Chat</title>
+</head>
+<body>
+  <h2>Socket.IO Chat</h2>
+  <div>
+    <input type="text" id="username" placeholder="Enter your username">
+    <button onclick="register()">Register</button>
+  </div>
+  <div>
+    <input type="text" id="receiver" placeholder="Send to (username)">
+    <input type="text" id="message" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+  <ul id="chat"></ul>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function register() {
+      const username = document.getElementById('username').value;
+      socket.emit('register', username);
+    }
+
+    socket.on('private message', function(msg) {
+      const chat = document.getElementById('chat');
+      const li = document.createElement('li');
+      li.appendChild(document.createTextNode(`${msg.from}: ${msg.content}`));
+      chat.appendChild(li);
+    });
+
+    function sendMessage() {
+      const messageInput = document.getElementById('message');
+      const receiverInput = document.getElementById('receiver');
+      const message = messageInput.value;
+      const receiver = receiverInput.value;
+      socket.emit('private message', { content: message, to: receiver });
+      messageInput.value = '';
+    }
+  </script>
+</body>
+</html>
